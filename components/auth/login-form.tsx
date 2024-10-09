@@ -32,10 +32,24 @@ const LoginForm = () => {
 
   const onSubmit = (data: z.infer<typeof LoginSchema>) => {
     setLoading(true);
-    console.log(data);
+
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+
+      if (user.email === data.email && user.password === data.password) {
+        alert("Login Successful! "+ user.name);
+      } else {
+        alert("Invalid email or password. Please try again.");
+      }
+    } else {
+      alert("User does not exist. Please register first.");
+    }
 
     setLoading(false);
-  };
+};
+
 
   const { pending } = useFormStatus();
   return (

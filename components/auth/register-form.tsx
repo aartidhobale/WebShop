@@ -1,26 +1,27 @@
 "use client";
 
-import CardWrapper from "./card-wrapper";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useRouter } from "next/navigation";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RegisterSchema } from "@/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { z } from "zod";
-import { useFormStatus } from "react-dom";
-import { useState } from "react";
+import CardWrapper from "./card-wrapper";
+import { RegisterSchema } from "@/schema";
 
 const RegisterForm = () => {
+  const { push } = useRouter();
   const [loading, setLoading] = useState(false);
+
   const form = useForm({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -35,12 +36,18 @@ const RegisterForm = () => {
     setLoading(true);
     console.log(data);
 
+    localStorage.setItem("user", JSON.stringify({
+      email: data.email,
+      password: data.password,
+      name: data.name
+    }));
+    alert("Registration Successful..!");
+
+    push("/auth/login");
 
     setLoading(false);
-
   };
 
-  const { pending } = useFormStatus();
   return (
     <CardWrapper
       label="Create an account"
@@ -58,11 +65,7 @@ const RegisterForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="email"
-                      placeholder="email"
-                    />
+                    <Input {...field} type="email" placeholder="email" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,7 +111,7 @@ const RegisterForm = () => {
               )}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={pending}>
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Loading..." : "Register"}
           </Button>
         </form>
